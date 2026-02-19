@@ -5,16 +5,12 @@ services:
     image: cowrie/cowrie:latest
     container_name: cowrie
     restart: unless-stopped
-    ports:
-      - "2222:2222"
-      - "2223:2223"
+    network_mode: host
     volumes:
       - cowrie_logs:/cowrie/cowrie-git/var/log/cowrie
       - ./cowrie.cfg:/cowrie/etc/cowrie.cfg:ro
     environment:
       - COWRIE_HOSTNAME=srv01
-    networks:
-      - honeypot
   cowrie-api:
     image: ghcr.io/sirgeon/cowrie-api:latest
     container_name: cowrie-api
