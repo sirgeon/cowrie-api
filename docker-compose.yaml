@@ -16,7 +16,7 @@ services:
     networks:
       - honeypot
   cowrie-api:
-    build: ./rust-api
+    build: .
     container_name: cowrie-api
     restart: unless-stopped
     ports:
