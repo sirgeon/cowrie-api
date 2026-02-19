@@ -55,31 +55,31 @@ pub async fn stats(State(state): State<Arc<AppState>>) -> Result<Json<StatsRespo
             _ => {}
         }
 
-        if recent.len() < 20 {
-            let detail = match eid {
-                "cowrie.login.failed" => format!(
-                    "{}:{}",
-                    e.username.as_deref().unwrap_or("-"),
-                    e.password.as_deref().unwrap_or("-"),
-                ),
-                "cowrie.login.success" => format!(
-                    "SUCCESS {}:{}",
-                    e.username.as_deref().unwrap_or("-"),
-                    e.password.as_deref().unwrap_or("-"),
-                ),
-                "cowrie.command.input" => e.input.clone().unwrap_or_default(),
-                _ => e.message.clone().unwrap_or_default(),
-            };
+        let detail = match eid {
+            "cowrie.login.failed" => format!(
+                "{}:{}",
+                e.username.as_deref().unwrap_or("-"),
+                e.password.as_deref().unwrap_or("-"),
+            ),
+            "cowrie.login.success" => format!(
+                "SUCCESS {}:{}",
+                e.username.as_deref().unwrap_or("-"),
+                e.password.as_deref().unwrap_or("-"),
+            ),
+            "cowrie.command.input" => e.input.clone().unwrap_or_default(),
+            _ => e.message.clone().unwrap_or_default(),
+        };
 
-            recent.push(EventSummary {
-                timestamp: e.timestamp.clone().unwrap_or_default(),
-                event_type: eid.to_owned(),
-                src_ip: e.src_ip.clone().unwrap_or_else(|| "unknown".into()),
-                detail,
-                session: e.session.clone().unwrap_or_default(),
-            });
-        }
+        recent.push(EventSummary {
+            timestamp: e.timestamp.clone().unwrap_or_default(),
+            event_type: eid.to_owned(),
+            src_ip: e.src_ip.clone().unwrap_or_else(|| "unknown".into()),
+            detail,
+            session: e.session.clone().unwrap_or_default(),
+        });
     }
+
+    let recent: Vec<EventSummary> = recent.into_iter().rev().take(20).collect();
 
     Ok(Json(StatsResponse {
         total_events: events.len(),
