@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: cowrie
+    restart: unless-stopped
+    ports:
+      - "2222:2222" 
+      - "2223:2223"
+    volumes:
+      - cowrie_logs:/cowrie/var/log/cowrie 
+      - ./cowrie.cfg:/cowrie/etc/cowrie.cfg:ro
+    environment:
+      - COWRIE_HOSTNAME=srv01
+    networks:
+      - honeypot
+  cowrie-api:
+    build: ./rust-api
+    container_name: cowrie-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Expose API to host (bind to 127.0.0.1 in prod!)
+    volumes:
+      - cowrie_logs:/cowrie/var/log/cowrie:ro
+    environment:
+      - COWRIE_LOG_PATH=/cowrie/var/log/cowrie/cowrie.json
+      - RUST_LOG=info
+    depends_on:
+      - cowrie
+    networks:
+      - honeypot
+
+volumes:
+  cowrie_logs:
+
+networks:
+  honeypot:
+    driver: bridge
