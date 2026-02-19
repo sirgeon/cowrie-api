@@ -16,7 +16,7 @@ services:
     networks:
       - honeypot
   cowrie-api:
-    build: .
+    image: ghcr.io/sirgeon/cowrie-api:latest
     container_name: cowrie-api
     restart: unless-stopped
     ports:
